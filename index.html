@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="h-full light selection:bg-emerald-500 selection:text-white">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>جدول الطالب - محمد جبلي</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Cairo & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Cairo', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#10b981',
+                            600: '#059669',
+                            700: '#047857',
+                            900: '#064e3b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { font-family: 'Cairo', sans-serif; transition: background-color 0.2s ease, color 0.2s ease; }
+        .tab-btn.active {
+            border-bottom: 3px solid #10b981;
+            font-weight: 800;
+        }
+        .light .tab-btn.active { color: #047857; }
+        .dark .tab-btn.active { color: #34d399; }
+        
+        .focus-ring:focus-visible {
+            outline: 2px solid #10b981;
+            outline-offset: 2px;
+        }
+        
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; color: black !important; }
+            .print-card { border: 1px solid #cbd5e1 !important; box-shadow: none !important; background: white !important; color: black !important; }
+        }
+    </style>
+</head>
+<body class="min-h-full flex flex-col justify-between bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased p-3 sm:p-5">
+
+    <a href="#main-view" class="sr-only focus:not-sr-only focus:absolute focus:top-3 focus:right-3 bg-emerald-600 text-white px-4 py-2 rounded-lg font-bold z-50 focus-ring">
+        التجاوز إلى المحتوى الرئيسي
+    </a>
+
+    <!-- MAIN CONTAINER -->
+    <main id="main-view" class="max-w-5xl w-full mx-auto space-y-4">
+        
+        <header class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+            
+            <!-- Student Identity -->
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-black text-xl shadow-md shrink-0" aria-hidden="true">
+                    م
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
+                            محمد احمد محمد جبلي
+                        </h1>
+                        <span class="px-2 py-0.5 text-[11px] font-bold bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/50 rounded-md">
+                            دكتوراه
+                        </span>
+                    </div>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 font-mono mt-0.5 flex flex-wrap items-center gap-2">
+                        <span>رقم جامعي: <strong class="text-slate-900 dark:text-slate-200">2701863</strong></span>
+                        <span>•</span>
+                        <span>كلية الحاسبات وتقنية المعلومات</span>
+                        <span>•</span>
+                        <span>علوم الحاسبات</span>
+                    </p>
+                </div>
+            </div>
+
+            <!-- Header Quick Actions & Controls -->
+            <div class="flex items-center gap-2">
+                <div class="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 flex items-center gap-1.5">
+                    <i class="fa-regular fa-calendar-check text-emerald-600 dark:text-emerald-400" aria-hidden="true"></i>
+                    <span>الفصل الدراسي الأول 2027</span>
+                    <span class="text-slate-400">|</span>
+                    <span class="font-bold text-emerald-700 dark:text-emerald-400">9.0 ساعات</span>
+                </div>
+
+                <!-- Theme Switcher -->
+                <button id="theme-toggle" 
+                        onclick="toggleTheme()" 
+                        aria-label="تبديل المظهر بين الداكن والفتح"
+                        class="p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors focus-ring">
+                    <i id="theme-icon" class="fa-solid fa-moon text-sm" aria-hidden="true"></i>
+                </button>
+
+                <!-- Print Button -->
+                <button onclick="window.print()" 
+                        title="طباعة الجدول"
+                        aria-label="طباعة الجدول الدراسي"
+                        class="no-print p-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors focus-ring">
+                    <i class="fa-solid fa-print text-sm" aria-hidden="true"></i>
+                </button>
+            </div>
+        </header>
+
+        <nav aria-label="أقسام الصفحة" class="no-print bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl px-3 flex gap-2 sm:gap-6 text-sm font-semibold overflow-x-auto shadow-sm">
+            <button onclick="switchTab('schedule-tab')" id="btn-schedule-tab" class="tab-btn active py-3 px-2 text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2 shrink-0 focus-ring">
+                <i class="fa-solid fa-calendar-days" aria-hidden="true"></i>
+                <span>الجدول الدراسي</span>
+            </button>
+            <button onclick="switchTab('faculty-tab')" id="btn-faculty-tab" class="tab-btn py-3 px-2 text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2 shrink-0 focus-ring">
+                <i class="fa-solid fa-user-tie" aria-hidden="true"></i>
+                <span>أعضاء هيئة التدريس</span>
+            </button>
+            <button onclick="switchTab('courses-tab')" id="btn-courses-tab" class="tab-btn py-3 px-2 text-slate-600 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 flex items-center gap-2 shrink-0 focus-ring">
+                <i class="fa-solid fa-book-bookmark" aria-hidden="true"></i>
+                <span>دليل المقررات</span>
+            </button>
+        </nav>
+
+        <!-- ==================== TAB 1: SCHEDULE (DEFAULT) ==================== -->
+        <div id="schedule-tab" class="tab-content space-y-4">
+            
+            <!-- Quick Info Banner -->
+            <div class="bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60 rounded-xl px-4 py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs text-emerald-900 dark:text-emerald-200 font-medium">
+                <div class="flex items-center gap-2">
+                    <i class="fa-solid fa-location-dot text-emerald-600 dark:text-emerald-400 text-sm" aria-hidden="true"></i>
+                    <span>المبنى والغرفة لجميع المقررات: <strong class="text-emerald-950 dark:text-emerald-100 font-bold">المبنى A80 - الغرفة H4-1</strong></span>
+                </div>
+                <div class="flex items-center gap-2 font-mono">
+                    <i class="fa-solid fa-clock text-emerald-600 dark:text-emerald-400" aria-hidden="true"></i>
+                    <span>الأيام: <strong class="text-slate-900 dark:text-white">الإثنين والأربعاء (MW)</strong></span>
+                </div>
+            </div>
+
+            <section aria-label="المقررات المجدولة حسب التسلسل الزمني" class="space-y-3">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5">
+
+                    <!-- COURSE 1: CS 704 (09:30 AM) -->
+                    <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500 rounded-2xl p-4 transition-all duration-200 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 left-0 h-1.5 bg-emerald-500"></div>
+                        
+                        <div class="space-y-3">
+                            <!-- Chronological Time Badge (ص / م) -->
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 bg-emerald-100 dark:bg-emerald-950/80 text-emerald-900 dark:text-emerald-300 font-mono text-xs font-bold border border-emerald-200 dark:border-emerald-800 rounded-lg flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock text-xs" aria-hidden="true"></i>
+                                    <span dir="ltr">09:30 ص - 10:45 ص</span>
+                                </span>
+                                <span class="font-mono text-xs text-slate-700 dark:text-slate-300 font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">CS-704</span>
+                            </div>
+
+                            <!-- Course Title (Bilingual) -->
+                            <div>
+                                <h2 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                    بنائية الحاسب المتقدمة
+                                </h2>
+                                <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 font-mono mt-0.5" dir="ltr">
+                                    Advanced Computer Architecture
+                                </p>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                                    شعبة <span class="text-slate-900 dark:text-slate-200 font-semibold">01</span> • <span class="font-mono">3.00</span> ساعات
+                                </p>
+                            </div>
+
+                            <!-- Details -->
+                            <div class="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-1.5 text-xs">
+                                <div class="flex justify-between items-center text-slate-700 dark:text-slate-300">
+                                    <span class="text-slate-500 dark:text-slate-400">الرقم المرجعي (CRN):</span>
+                                    <strong class="font-mono text-emerald-700 dark:text-emerald-400 font-bold">43677</strong>
+                                </div>
+                                <div class="flex justify-between items-start text-slate-700 dark:text-slate-300">
+                                    <span class="text-slate-500 dark:text-slate-400 shrink-0">الدكتور:</span>
+                                    <div class="text-left dir-rtl">
+                                        <strong class="text-slate-900 dark:text-slate-100 block">ماهر علي خماخم</strong>
+                                        <span class="text-slate-500 dark:text-slate-400 font-mono text-[11px] block" dir="ltr">Maher Khemakhem</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- COURSE 2: CS 702 (11:00 AM) -->
+                    <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-cyan-500 rounded-2xl p-4 transition-all duration-200 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 left-0 h-1.5 bg-cyan-500"></div>
+                        
+                        <div class="space-y-3">
+                            <!-- Chronological Time Badge (ص / م) -->
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 bg-cyan-100 dark:bg-cyan-950/80 text-cyan-900 dark:text-cyan-300 font-mono text-xs font-bold border border-cyan-200 dark:border-cyan-800 rounded-lg flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock text-xs" aria-hidden="true"></i>
+                                    <span dir="ltr">11:00 ص - 12:15 م</span>
+                                </span>
+                                <span class="font-mono text-xs text-slate-700 dark:text-slate-300 font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">CS-702</span>
+                            </div>
+
+                            <!-- Course Title (Bilingual) -->
+                            <div>
+                                <h2 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors">
+                                    بنائة وتصميم البرمجيات
+                                </h2>
+                                <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 font-mono mt-0.5" dir="ltr">
+                                    Software Architecture and Design
+                                </p>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                                    شعبة <span class="text-slate-900 dark:text-slate-200 font-semibold">02</span> • <span class="font-mono">3.00</span> ساعات
+                                </p>
+                            </div>
+
+                            <!-- Details -->
+                            <div class="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-1.5 text-xs">
+                                <div class="flex justify-between items-center text-slate-700 dark:text-slate-300">
+                                    <span class="text-slate-500 dark:text-slate-400">الرقم المرجعي (CRN):</span>
+                                    <strong class="font-mono text-cyan-700 dark:text-cyan-400 font-bold">43697</strong>
+                                </div>
+                                <div class="flex justify-between items-start text-slate-700 dark:text-slate-300">
+                                    <span class="text-slate-500 dark:text-slate-400 shrink-0">الدكتور:</span>
+                                    <div class="text-left dir-rtl">
+                                        <strong class="text-slate-900 dark:text-slate-100 block">عماد يوسف البسام</strong>
+                                        <span class="text-slate-500 dark:text-slate-400 font-mono text-[11px] block" dir="ltr">Emad Albassam</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- COURSE 3: CS 701 (01:00 PM) -->
+                    <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-violet-500 rounded-2xl p-4 transition-all duration-200 flex flex-col justify-between shadow-sm relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 left-0 h-1.5 bg-violet-500"></div>
+                        
+                        <div class="space-y-3">
+                            <!-- Chronological Time Badge (ص / م) -->
+                            <div class="flex items-center justify-between">
+                                <span class="px-2.5 py-1 bg-violet-100 dark:bg-violet-950/80 text-violet-900 dark:text-violet-300 font-mono text-xs font-bold border border-violet-200 dark:border-violet-800 rounded-lg flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock text-xs" aria-hidden="true"></i>
+                                    <span dir="ltr">01:00 م - 02:15 م</span>
+                                </span>
+                                <span class="font-mono text-xs text-slate-700 dark:text-slate-300 font-bold bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">CS-701</span>
+                            </div>
+
+                            <!-- Course Title (Bilingual) -->
+                            <div>
+                                <h2 class="text-base font-bold text-slate-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                                    موضوعات متقدمة في الشبكات
+                                </h2>
+                                <p class="text-xs font-semibold text-slate-500 dark:text-slate-400 font-mono mt-0.5" dir="ltr">
+                                    Advanced Topics in Networking
+                                </p>
+                                <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                                    شعبة <span class="text-slate-900 dark:text-slate-200 font-semibold">03</span> • <span class="font-mono">3.00</span> ساعات
+                                </p>
+                            </div>
+
+                            <!-- Details -->
+                            <div class="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-1.5 text-xs">
+                                <div class="flex justify-between items-center text-slate-700 dark:text-slate-300">
+                                    <span class="text-slate-500 dark:text-slate-400">الرقم المرجعي (CRN):</span>
+                                    <strong class="font-mono text-violet-700 dark:text-violet-400 font-bold">43706</strong>
+                                </div>
+                                <div class="flex justify-between items-start text-slate-700 dark:text-slate-300">
+                                    <span class="text-slate-500 dark:text-slate-400 shrink-0">الدكتور:</span>
+                                    <div class="text-left dir-rtl">
+                                        <strong class="text-slate-900 dark:text-slate-100 block">نايف وهيب راجخان</strong>
+                                        <span class="text-slate-500 dark:text-slate-400 font-mono text-[11px] block" dir="ltr">Naif Rajkhan</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                </div>
+            </section>
+
+            <section aria-label="جدول البيانات المباشر والشامل" class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+                <div class="flex flex-wrap items-center justify-between gap-3 mb-3 pb-2 border-b border-slate-100 dark:border-slate-800">
+                    <h3 class="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-table-list text-emerald-600 dark:text-emerald-400" aria-hidden="true"></i>
+                        <span>جدول الطالب المعتمد (بيانات دقيقة)</span>
+                    </h3>
+                    <div class="flex items-center gap-2 text-xs font-mono text-slate-500">
+                        <span>الوضع الأكاديمي: <strong class="text-emerald-700 dark:text-emerald-400">مستجد</strong></span>
+                        <span>•</span>
+                        <span>حالة التسجيل: <strong class="text-emerald-700 dark:text-emerald-400">مسجل</strong></span>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs">
+                        <thead>
+                            <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 font-bold">
+                                <th scope="col" class="pb-2.5 pr-2">الرقم المرجعي للشعبة</th>
+                                <th scope="col" class="pb-2.5">المقرر والشعبة</th>
+                                <th scope="col" class="pb-2.5">اسم المادة</th>
+                                <th scope="col" class="pb-2.5">الوحدات</th>
+                                <th scope="col" class="pb-2.5">الأيام</th>
+                                <th scope="col" class="pb-2.5">الوقت</th>
+                                <th scope="col" class="pb-2.5">المبنى والغرفة</th>
+                                <th scope="col" class="pb-2.5 pl-2">تاريخ الإضافة</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60 text-slate-800 dark:text-slate-200 font-medium">
+                            <!-- Chronological Row 1: CS-704 -->
+                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                                <td class="py-2.5 pr-2 font-mono text-emerald-700 dark:text-emerald-400 font-bold">43677</td>
+                                <td class="py-2.5 font-mono">CS-704 - 01</td>
+                                <td class="py-2.5 font-bold">بنائية الحاسب المتقدمة <span class="font-normal text-slate-500 text-[11px]" dir="ltr">Advanced Computer Architecture</span></td>
+                                <td class="py-2.5 font-mono">3</td>
+                                <td class="py-2.5 font-mono">.M.W...</td>
+                                <td class="py-2.5 font-mono" dir="ltr">09:30 ص - 10:45 ص</td>
+                                <td class="py-2.5 font-mono">A80 / H4-1</td>
+                                <td class="py-2.5 pl-2 font-mono">07/03/1448</td>
+                            </tr>
+                            <!-- Chronological Row 2: CS-702 -->
+                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                                <td class="py-2.5 pr-2 font-mono text-cyan-700 dark:text-cyan-400 font-bold">43697</td>
+                                <td class="py-2.5 font-mono">CS-702 - 02</td>
+                                <td class="py-2.5 font-bold">بنائة وتصميم البرمجيات <span class="font-normal text-slate-500 text-[11px]" dir="ltr">Software Architecture and Design</span></td>
+                                <td class="py-2.5 font-mono">3</td>
+                                <td class="py-2.5 font-mono">.M.W...</td>
+                                <td class="py-2.5 font-mono" dir="ltr">11:00 ص - 12:15 م</td>
+                                <td class="py-2.5 font-mono">A80 / H4-1</td>
+                                <td class="py-2.5 pl-2 font-mono">07/03/1448</td>
+                            </tr>
+                            <!-- Chronological Row 3: CS-701 -->
+                            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/40">
+                                <td class="py-2.5 pr-2 font-mono text-violet-700 dark:text-violet-400 font-bold">43706</td>
+                                <td class="py-2.5 font-mono">CS-701 - 03</td>
+                                <td class="py-2.5 font-bold">موضوعات متقدمة في الشبكات <span class="font-normal text-slate-500 text-[11px]" dir="ltr">Advanced Topics in Networking</span></td>
+                                <td class="py-2.5 font-mono">3</td>
+                                <td class="py-2.5 font-mono">.M.W...</td>
+                                <td class="py-2.5 font-mono" dir="ltr">01:00 م - 02:15 م</td>
+                                <td class="py-2.5 font-mono">A80 / H4-1</td>
+                                <td class="py-2.5 pl-2 font-mono">07/03/1448</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== TAB 2: FACULTY / PROFESSORS ==================== -->
+        <div id="faculty-tab" class="tab-content hidden space-y-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+                <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-graduation-cap text-emerald-600 dark:text-emerald-400" aria-hidden="true"></i>
+                    <span>أعضاء هيئة التدريس والروابط الأكاديمية</span>
+                </h2>
+                <p class="text-xs text-slate-600 dark:text-slate-400">الملفات البحثية والمهنية لأساتذة المقررات الدراسية</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- PROFESSOR 1: Maher Khemakhem -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-400 font-bold flex items-center justify-center text-base shrink-0" aria-hidden="true">
+                                م.خ
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-base text-slate-900 dark:text-white">ماهر علي خماخم</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 font-mono" dir="ltr">Maher Khemakhem</p>
+                                <p class="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium mt-0.5">أستاذ مقرر CS-704</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+                            <a href="https://scholar.google.com/citations?user=krjxCCgAAAAJ&hl=fr" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-colors focus-ring">
+                                <span class="flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-600" aria-hidden="true"></i> Google Scholar</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://dblp.org/pid/22/2435.html" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-colors focus-ring">
+                                <span class="flex items-center gap-2"><i class="fa-solid fa-book text-amber-600" aria-hidden="true"></i> DBLP Profile</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://www.researchgate.net/profile/Maher-Khemakhem" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-colors focus-ring">
+                                <span class="flex items-center gap-2"><i class="fa-solid fa-flask text-teal-600" aria-hidden="true"></i> ResearchGate</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://sciprofiles.com/profile/545187" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-colors focus-ring">
+                                <span class="flex items-center gap-2"><i class="fa-solid fa-id-badge text-indigo-600" aria-hidden="true"></i> SciProfiles</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROFESSOR 2: Emad Albassam -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-700 dark:text-cyan-400 font-bold flex items-center justify-center text-base shrink-0" aria-hidden="true">
+                                ع.ب
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-base text-slate-900 dark:text-white">عماد يوسف البسام</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 font-mono" dir="ltr">Emad Albassam</p>
+                                <p class="text-[11px] text-cyan-600 dark:text-cyan-400 font-medium mt-0.5">أستاذ مقرر CS-702</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+                            <a href="https://www.linkedin.com/in/emad-albassam-a78a18a3/" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-colors focus-ring">
+                                <span class="flex items-center gap-2"><i class="fa-brands fa-linkedin text-blue-700" aria-hidden="true"></i> LinkedIn</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://scholar.google.com/citations?user=G4-AWdcAAAAJ&hl=ar" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-colors focus-ring">
+                                <span class="flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-600" aria-hidden="true"></i> Google Scholar</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PROFESSOR 3: Naif Rajkhan -->
+                <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-3 mb-3">
+                            <div class="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-950 text-violet-700 dark:text-violet-400 font-bold flex items-center justify-center text-base shrink-0" aria-hidden="true">
+                                ن.ر
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-base text-slate-900 dark:text-white">نايف وهيب راجخان</h3>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 font-mono" dir="ltr">Naif Rajkhan</p>
+                                <p class="text-[11px] text-violet-600 dark:text-violet-400 font-medium mt-0.5">أستاذ مقرر CS-701</p>
+                            </div>
+                        </div>
+
+                        <div class="space-y-2 pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
+                            <a href="https://scholar.google.com/citations?user=McR_LnEAAAAJ&hl=en" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-colors focus-ring">
+                                <span class="flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-blue-600" aria-hidden="true"></i> Google Scholar</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://www.linkedin.com/in/naif-rajkhan-0771a96a/" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-colors focus-ring">
+                                <span class="flex items-center gap-2"><i class="fa-brands fa-linkedin text-blue-700" aria-hidden="true"></i> LinkedIn</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://www.researchgate.net/scientific-contributions/Naif-Waheb-Rajkhan-2326274005" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-colors focus-ring">
+                                <span class="flex items-center gap-2"><i class="fa-solid fa-flask text-teal-600" aria-hidden="true"></i> ResearchGate</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://orcid.org/0000-0003-3023-2286" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-colors focus-ring">
+                                <span class="flex items-center gap-2"><i class="fa-solid fa-microchip text-emerald-600" aria-hidden="true"></i> ORCID</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400" aria-hidden="true"></i>
+                            </a>
+                            <a href="https://dl.acm.org/profile/99660619510" target="_blank" rel="noopener noreferrer" 
+                               class="flex items-center justify-between p-2 rounded-lg bg-slate-50 hover:bg-slate-100 dark:bg-slate-800/60 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 transition-colors focus-ring">
+                                <span class="flex items-center gap-2"><i class="fa-solid fa-laptop-code text-purple-600" aria-hidden="true"></i> ACM Digital Library</span>
+                                <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400" aria-hidden="true"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ==================== TAB 3: COURSE CATALOG ==================== -->
+        <div id="courses-tab" class="tab-content hidden space-y-4">
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm">
+                <h2 class="text-sm font-bold text-slate-900 dark:text-white mb-1 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-emerald-600 dark:text-emerald-400" aria-hidden="true"></i>
+                    <span>دليل ووصف المقررات الدراسية (Course Catalog)</span>
+                </h2>
+                <p class="text-xs text-slate-600 dark:text-slate-400">تفاصيل المقررات والساعات المعتمدة والمتطلبات باللغتين العربية والإنجليزية</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <!-- COURSE CS 701 -->
+                <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3.5">
+                    <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                        <div>
+                            <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-violet-100 dark:bg-violet-950 text-violet-800 dark:text-violet-300">CS-701</span>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">موضوعات متقدمة في مجال الشبكات</h3>
+                            <h4 class="text-xs font-semibold text-slate-500 font-mono" dir="ltr">Advanced Topics in Networking</h4>
+                        </div>
+                        <div class="text-left font-mono text-xs text-slate-500 shrink-0">
+                            <div><strong class="text-slate-900 dark:text-slate-200">3</strong> Credits / ساعات</div>
+                            <div class="text-[11px] text-slate-400">Prerequisites: –</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 text-xs">
+                        <div>
+                            <strong class="text-slate-900 dark:text-slate-100 block mb-0.5">الوصف (بالعربية):</strong>
+                            <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                                يتناول هذا المقرر مفاهيم متقدمة في شبكات الحاسوب والاتصالات الحديثة، ويغطي التقنيات الناشئة، بما في ذلك ابتكارات بروتوكول TCP/IP، وبروتوكول الإنترنت عبر الهاتف المحمول، وشبكات البرمجيات المعرفة (SDN)، والحوسبة السحابية، وشبكات الجيل الرابع والخامس. ويركز المقرر على إدارة حركة البيانات، وجودة الخدمة، وبنى الإنترنت من الجيل التالي. كما يتناول إدارة التنقل، واستمرارية الخدمة، وتقييم الأداء.
+                            </p>
+                        </div>
+                        <div dir="ltr" class="text-left bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800/80">
+                            <strong class="text-slate-900 dark:text-slate-100 block mb-0.5 font-bold">Description (English):</strong>
+                            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                                This course examines advanced concepts in modern computer and telecommunication networks. It covers emerging technologies, including TCP/IP innovations, Mobile IP, SDN, cloud computing, and 4G/5G networks. Emphasis is placed on traffic management, quality of service (QoS), and next-generation Internet architectures. Mobility management, service continuity, and performance evaluation are also discussed.
+                            </p>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- COURSE CS 702 -->
+                <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3.5">
+                    <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                        <div>
+                            <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-300">CS-702</span>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">بنائة وتصميم البرمجيات</h3>
+                            <h4 class="text-xs font-semibold text-slate-500 font-mono" dir="ltr">Software Architecture and Design</h4>
+                        </div>
+                        <div class="text-left font-mono text-xs text-slate-500 shrink-0">
+                            <div><strong class="text-slate-900 dark:text-slate-200">3</strong> Credits / ساعات</div>
+                            <div class="text-[11px] text-slate-400">Prerequisites: –</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 text-xs">
+                        <div>
+                            <strong class="text-slate-900 dark:text-slate-100 block mb-0.5">الوصف (بالعربية):</strong>
+                            <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                                يركز هذا المقرر على نمذجة وتصميم الأنظمة البرمجية المعقدة. ويتناول أنماط التصميم المعماري، وخصائص الجودة، والمفاضلات التصميمية. وتشمل المواضيع البنى الموزعة، والخدمية، والمكونات، والطبقية. كما تُسهم دراسات الحالة والمشاريع البحثية في تعزيز مهارات التحليل والتصميم.
+                            </p>
+                        </div>
+                        <div dir="ltr" class="text-left bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800/80">
+                            <strong class="text-slate-900 dark:text-slate-100 block mb-0.5 font-bold">Description (English):</strong>
+                            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                                This course focuses on architectural modeling and design of complex software systems. It explores architectural styles, quality attributes, and design trade-offs. Topics include distributed, service-oriented, component-based, and layered architectures. Case studies and research-oriented projects enhance analytical and design skills.
+                            </p>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- COURSE CS 704 -->
+                <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3.5">
+                    <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                        <div>
+                            <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-800 dark:text-emerald-300">CS-704</span>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">بنائية الحاسب المتقدمة</h3>
+                            <h4 class="text-xs font-semibold text-slate-500 font-mono" dir="ltr">Advanced Computer Architecture</h4>
+                        </div>
+                        <div class="text-left font-mono text-xs text-slate-500 shrink-0">
+                            <div><strong class="text-slate-900 dark:text-slate-200">3</strong> Credits / ساعات</div>
+                            <div class="text-[11px] text-slate-400">Prerequisites: –</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 text-xs">
+                        <div>
+                            <strong class="text-slate-900 dark:text-slate-100 block mb-0.5">الوصف (بالعربية):</strong>
+                            <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                                يُقدّم هذا المقرر دراسة متقدمة لتنظيم وتصميم أنظمة الحاسوب. تشمل المواضيع المعالجات، وأنظمة الذاكرة، والمعالجات المتعددة، والتخزين المؤقت، والمحاكاة الافتراضية، والمعالجة المتوازية. كما يتناول المقرر مبادئ تقييم الأداء والنماذج المعمارية، مثل تصنيف فلين. ويُعرّف أيضاً بالاتجاهات الناشئة في أنظمة الحوسبة عالية الأداء والحوسبة الفائقة.
+                            </p>
+                        </div>
+                        <div dir="ltr" class="text-left bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800/80">
+                            <strong class="text-slate-900 dark:text-slate-100 block mb-0.5 font-bold">Description (English):</strong>
+                            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                                This course provides advanced study of computer system organization and design. Topics include processors, memory systems, multiprocessors, caching, virtualization, and parallel processing. Performance evaluation principles and architectural models, such as Flynn’s taxonomy are examined. Emerging trends in high-performance and supercomputing systems are also introduced.
+                            </p>
+                        </div>
+                    </div>
+                </article>
+
+                <!-- COURSE CS 703 -->
+                <article class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-sm space-y-3.5">
+                    <div class="flex items-start justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                        <div>
+                            <span class="font-mono text-xs font-bold px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">CS-703</span>
+                            <h3 class="text-base font-bold text-slate-900 dark:text-white mt-1">أنظمة قواعد البيانات المتقدمة</h3>
+                            <h4 class="text-xs font-semibold text-slate-500 font-mono" dir="ltr">Advanced Database Systems</h4>
+                        </div>
+                        <div class="text-left font-mono text-xs text-slate-500 shrink-0">
+                            <div><strong class="text-slate-900 dark:text-slate-200">3</strong> Credits / ساعات</div>
+                            <div class="text-[11px] text-slate-400">Prerequisites: –</div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-2 text-xs">
+                        <div>
+                            <strong class="text-slate-900 dark:text-slate-100 block mb-0.5">الوصف (بالعربية):</strong>
+                            <p class="text-slate-700 dark:text-slate-300 leading-relaxed">
+                                يستكشف هذا المقرر الدراسي تقنيات قواعد البيانات المتقدمة والناشئة، ويغطي أنظمة قواعد البيانات الموجهة للكائنات، وقواعد البيانات العلائقية للكائنات، وقواعد البيانات الموزعة. تشمل المواضيع إدارة المعاملات، والتحكم في التزامن، وأنظمة NoSQL/NewSQL، وقابلية توسيع البيانات. ويركز المقرر على اتجاهات البحث الحديثة وهياكل البيانات الموزعة.
+                            </p>
+                        </div>
+                        <div dir="ltr" class="text-left bg-slate-50 dark:bg-slate-800/50 p-2.5 rounded-xl border border-slate-200/60 dark:border-slate-800/80">
+                            <strong class="text-slate-900 dark:text-slate-100 block mb-0.5 font-bold">Description (English):</strong>
+                            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">
+                                This course explores advanced and emerging database technologies. It covers object-oriented, object-relational, and distributed database systems. Topics include transaction management, concurrency control, NoSQL/NewSQL systems, and data scalability. Emphasis is placed on modern research trends and distributed data architectures.
+                            </p>
+                        </div>
+                    </div>
+                </article>
+
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            const selectedTab = document.getElementById(tabId);
+            const selectedBtn = document.getElementById('btn-' + tabId);
+
+            if (selectedTab) selectedTab.classList.remove('hidden');
+            if (selectedBtn) selectedBtn.classList.add('active');
+        }
+
+        // Theme Toggle Functionality
+        function toggleTheme() {
+            const htmlEl = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+
+            if (htmlEl.classList.contains('dark')) {
+                htmlEl.classList.remove('dark');
+                htmlEl.classList.add('light');
+                themeIcon.className = 'fa-solid fa-moon text-sm';
+                localStorage.setItem('theme', 'light');
+            } else {
+                htmlEl.classList.remove('light');
+                htmlEl.classList.add('dark');
+                themeIcon.className = 'fa-solid fa-sun text-sm text-amber-400';
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        // Load Initial Theme Preference
+        (function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            const htmlEl = document.documentElement;
+            const themeIcon = document.getElementById('theme-icon');
+
+            if (savedTheme === 'dark') {
+                htmlEl.classList.remove('light');
+                htmlEl.classList.add('dark');
+                if (themeIcon) themeIcon.className = 'fa-solid fa-sun text-sm text-amber-400';
+            } else {
+                htmlEl.classList.remove('dark');
+                htmlEl.classList.add('light');
+                if (themeIcon) themeIcon.className = 'fa-solid fa-moon text-sm';
+            }
+        })();
+    </script>
+</body>
+</html>
