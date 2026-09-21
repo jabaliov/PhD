@@ -1,0 +1,428 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SDN — Day 1: Networking Mental Model</title>
+<style>
+:root{--bg:#f5f7fb;--card:#fff;--ink:#172033;--muted:#5f6b7a;--accent:#1769aa;--green:#2e7d32;--warn:#9a6700;--line:#dfe5ec}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Tahoma,Arial,sans-serif;line-height:1.8}
+header{background:linear-gradient(135deg,#12385a,#1769aa);color:#fff;padding:42px 7%;text-align:right}
+header h1{margin:0 0 8px;font-size:34px} header p{margin:5px 0;opacity:.93}
+main{max-width:1100px;margin:28px auto;padding:0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:24px;margin:18px 0;box-shadow:0 5px 18px rgba(20,35,55,.05)}
+h2{font-size:25px;margin-top:0;color:#12385a} h3{color:#1769aa;margin-bottom:8px}
+.term{font-weight:800;color:#1769aa}.en{direction:ltr;display:inline-block;font-weight:700}
+.note{border-right:5px solid var(--accent);background:#eef6ff;padding:14px 16px;border-radius:8px}
+.warn{border-right:5px solid #d18b00;background:#fff8e5;padding:14px 16px;border-radius:8px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.box{border:1px solid var(--line);border-radius:12px;padding:16px;background:#fbfcfe}
+.flow{direction:ltr;text-align:center;font-family:ui-monospace,Menlo,monospace;background:#0f172a;color:#e5edf6;border-radius:12px;padding:20px;white-space:pre-wrap}
+table{width:100%;border-collapse:collapse;margin-top:12px}th,td{border:1px solid var(--line);padding:10px;vertical-align:top}th{background:#eef4f9}
+.quiz{background:#fbfdff;border:1px solid #cfe0ef;border-radius:12px;padding:16px;margin:12px 0}
+.answer{margin-top:10px;background:#f0f8f1;border-right:4px solid var(--green);padding:10px;border-radius:6px}
+details{margin-top:10px} summary{cursor:pointer;font-weight:700;color:#1769aa}
+.small{color:var(--muted);font-size:14px}.tag{display:inline-block;padding:3px 9px;border-radius:999px;background:#e9f3fb;color:#1769aa;font-size:13px;margin:3px}
+footer{color:var(--muted);text-align:center;padding:30px}
+</style>
+</head>
+<body>
+<header>
+  <h1>Day 1 — Networking Mental Model</h1>
+  <p>SDN Study Plan & Teaching Protocol</p>
+  <p>السؤال المركزي: <strong>عندما يرسل جهاز بيانات إلى جهاز آخر، ما الذي يتحرك فعليًا داخل الشبكة؟</strong></p>
+</header>
+<main>
+
+<section class="card">
+<h2>A. أين نحن؟</h2>
+<div class="grid">
+<div class="box"><strong>اليوم:</strong><br>Day 1</div>
+<div class="box"><strong>الموضوع:</strong><br>Networking Mental Model</div>
+<div class="box"><strong>لماذا الآن؟</strong><br>لأن SDN يتعامل مع كيفية التحكم في سلوك الشبكة، ولا يمكن فهم ذلك قبل فهم الشيء الذي تتحركه الشبكة: البيانات داخل Packet وFrame.</div>
+</div>
+<div class="note">
+<strong>قاعدة اليوم:</strong> لن ندخل في Switch/Router/Routing/Forwarding كموضوعات مستقلة. هذه موضوعات Day 2. سنبني فقط الأساس الذي تحتاجه لفهمها لاحقًا.
+</div>
+</section>
+
+<section class="card">
+<h2>B. في نهاية هذا الدرس أريدك أن تكون قادرًا على...</h2>
+<ul>
+<li>شرح معنى <span class="term">Network</span> و<span class="term">Host</span> و<span class="term">Node</span> و<span class="term">Link</span> و<span class="term">NIC</span>.</li>
+<li>شرح لماذا لا نرسل "الرسالة" داخل الشبكة ككتلة واحدة، بل تمر عبر طبقات تغلف البيانات.</li>
+<li>تمييز <span class="term">Packet</span> عن <span class="term">Frame</span>.</li>
+<li>فهم <span class="term">Header</span> و<span class="term">Payload</span>.</li>
+<li>فهم الفرق الوظيفي بين <span class="term">IP Address</span> و<span class="term">MAC Address</span>.</li>
+<li>فهم أن <span class="term">Ethernet</span> يحدد إطارًا (Frame) للتواصل على الوصلة المحلية.</li>
+<li>فهم لماذا يوجد <span class="term">Port</span> في سياق الاتصال بين التطبيقات.</li>
+<li>تتبع مثال Laptop → Server دون خلط بين DNS وTCP وIP وEthernet.</li>
+</ul>
+</section>
+
+<section class="card">
+<h2>C. أين سنصل؟</h2>
+<div class="flow">
+Networking Basics
+      ↓
+DAY 1: Network / Host / Node / Link / NIC
+      ↓
+Packet / Frame / Header / Payload
+      ↓
+MAC / IP / Ethernet / Port
+      ↓
+DAY 2: Switch / Router / Routing / Forwarding
+      ↓
+DAY 3: Control Plane / Data Plane
+      ↓
+DAY 4: Why SDN?
+      ↓
+DAY 5: Controller / OpenFlow / Flow Table
+      ↓
+DAY 6: Network OS
+      ↓
+DAY 7: Programmable Data Plane
+</div>
+</section>
+
+<section class="card">
+<h2>0. بوابة الـ Prerequisites</h2>
+<p>قبل أن نبني mental model، نتحقق من أساسيات سريعة. لا تحتاج تفاصيل عميقة؛ المطلوب فقط أن تفهم الصورة.</p>
+<div class="quiz"><strong>1)</strong> ما الفرق العام بين جهاز المستخدم وWeb Server؟</div>
+<div class="quiz"><strong>2)</strong> عندما تكتب اسم موقع، هل الاسم نفسه هو العنوان الذي تستخدمه الشبكة للوصول إلى الجهاز؟</div>
+<div class="quiz"><strong>3)</strong> ما الذي يقدمه DNS بصورة مبسطة؟</div>
+<div class="quiz"><strong>4)</strong> لماذا نحتاج TCP في المثال الموجود في السلايدات؟</div>
+<details><summary>الإجابات النموذجية</summary>
+<div class="answer">1) كلاهما Host، لكن أحدهما Client في المثال والآخر Web Server يقدم الخدمة.</div>
+<div class="answer">2) لا. السلايدات تشرح أن Domain Name يحتاج إلى ترجمة إلى IP Address بواسطة DNS.</div>
+<div class="answer">3) DNS Query/Reply تُستخدم للحصول على IP Address المرتبط باسم النطاق.</div>
+<div class="answer">4) السلايدات تستخدم TCP Connection لنقل بيانات التطبيق؛ وتوضح أن HTTP request تُرسل عبر TCP وتُغلف في TCP Segment.</div>
+</details>
+</section>
+
+<section class="card">
+<h2>1. ابدأ من المشكلة: لدينا Laptop يريد الوصول إلى Server</h2>
+<p>تخيل أنك فتحت المتصفح وطلبت صفحة من Web Server. السؤال الذي يهمنا اليوم ليس "ما هو SDN؟"، بل:</p>
+<div class="note"><strong>ما الذي يتحرك فعليًا من Laptop إلى Server؟ وهل تتحرك الرسالة نفسها، أم شيء آخر؟</strong></div>
+<p>السلايدات تبدأ بمثال Bob الذي يعرف اسم النطاق ويستخدم Web Browser للوصول إلى Web Server، ثم تمر عبر DNS وTCP وIP وMAC/Ethernet حتى تصل البيانات إلى الطرف الآخر.</p>
+</section>
+
+<section class="card">
+<h2>2. Network</h2>
+<h3>المشكلة</h3><p>جهازان لا يستطيعان تبادل البيانات إذا لم توجد وسيلة تربطهما.</p>
+<h3>السؤال الطبيعي</h3><p>ما اسم مجموعة الأجهزة والروابط التي تسمح بتبادل البيانات؟</p>
+<h3>المصطلح</h3><p><span class="term">Network</span> — شبكة: مجموعة من الأجهزة المتصلة بروابط تسمح بتبادل البيانات.</p>
+<div class="flow">Laptop ───── Link ───── Server
+          \           /
+           Network</div>
+<h3>اختبار الفهم</h3><p>هل الـNetwork هو "سلك" فقط؟ <strong>لا.</strong> السلك قد يكون Link واحدًا؛ الشبكة هي المنظومة الأوسع.</p>
+</section>
+
+<section class="card">
+<h2>3. Host وNode</h2>
+<h3>السؤال الطبيعي</h3><p>إذا كان لدينا أجهزة داخل الشبكة، كيف نصف الجهاز الذي يشارك في الاتصال؟</p>
+<div class="grid">
+<div class="box"><span class="term">Host</span><br>جهاز نهائي (End System) يتعامل مع البيانات كتطبيقات وخدمات، مثل Laptop أو Server.</div>
+<div class="box"><span class="term">Node</span><br>مصطلح أوسع لنقطة/جهاز في الشبكة. لا تحصره تلقائيًا في أجهزة المستخدم فقط.</div>
+</div>
+<div class="warn"><strong>فخ مهم:</strong> كل Host يمكن اعتباره Node في الاستخدام العام، لكن ليس كل Node بالضرورة Host نهائيًا. لا تجعل المصطلحين مترادفين 100% في كل سياق.</div>
+</section>
+
+<section class="card">
+<h2>4. Link</h2>
+<h3>المشكلة</h3><p>لدينا Laptop وRouter، لكن كيف تنتقل الإشارة من أحدهما إلى الآخر؟</p>
+<h3>المصطلح</h3><p><span class="term">Link</span> هو وصلة الاتصال بين عقدتين متصلتين مباشرة، وقد تكون عبر Ethernet أو Wi‑Fi أو وسيلة أخرى.</p>
+<div class="flow">[Laptop] ═════ Link ═════ [Network Device]</div>
+<p class="small">السلايدات تعرض access technology مثل Fiber, Cable, Wi‑Fi, Cellular كوسائل وصول.</p>
+</section>
+
+<section class="card">
+<h2>5. NIC — نقطة خروج ودخول البيانات من الجهاز</h2>
+<h3>السؤال الطبيعي</h3><p>الجهاز لديه بيانات، لكن عبر أي واجهة يرسلها إلى الشبكة؟</p>
+<p><span class="term">NIC (Network Interface Card/Controller)</span> هي واجهة الشبكة التي تمكّن الجهاز من الاتصال بالشبكة، مثل واجهة Ethernet أو Wi‑Fi.</p>
+<div class="flow">Application
+    ↓
+Operating System
+    ↓
+NIC
+    ↓
+Network</div>
+<p><strong>فكرة لا تنساها:</strong> الـNIC هي "الباب" الذي يربط الجهاز بالشبكة.</p>
+</section>
+
+<section class="card">
+<h2>6. الآن السؤال الأهم: ما الذي يتحرك؟</h2>
+<p>لنقل رسالة مثل:</p>
+<div class="note">"أريد حجز تذكرة طيران"</div>
+<p>التطبيق لا يرسل هذه العبارة مباشرة عبر السلك. البيانات تمر بعمليات <strong>encapsulation</strong> (تغليف) بحيث تضيف الطبقات معلومات تساعد في النقل والتوصيل.</p>
+<div class="flow">Application Data
+      ↓
++-------------------------+
+| TCP Header | Data       |  ← TCP Segment
++-------------------------+
+      ↓
++--------------------------------+
+| IP Header | TCP Segment        |  ← IP Datagram / Packet
++--------------------------------+
+      ↓
++------------------------------------------------+
+| Ethernet Header | IP Packet | Ethernet Trailer| ← Frame
++------------------------------------------------+</div>
+<div class="warn"><strong>تنبيه:</strong> هذا الرسم mental model تعليمي مبسط. أسماء الوحدات الدقيقة قد تختلف حسب الطبقة والسياق، لكن الهدف هنا تثبيت علاقة "بيانات داخل Segment داخل IP packet/datagram داخل Ethernet frame".</div>
+</section>
+
+<section class="card">
+<h2>7. Packet</h2>
+<h3>المشكلة</h3><p>كيف نمثل وحدة بيانات يمكن للـIP layer التعامل معها عبر الشبكة؟</p>
+<p><span class="term">Packet</span> هو مصطلح عام لوحدة بيانات تُرسل عبر الشبكة. وفي السلايدات، عند IP Layer يتم تغليف TCP Segment داخل <strong>IP Datagram</strong>.</p>
+<p>إذن لا تحفظ: "Packet = شيء مستقل دائمًا". الأفضل: <strong>Packet وصف عام لوحدة بيانات شبكية، والسلايدات تستخدم IP Datagram كوحدة IP.</strong></p>
+</section>
+
+<section class="card">
+<h2>8. Header وPayload</h2>
+<h3>السؤال الطبيعي</h3><p>إذا كانت البيانات داخل Packet/Frame، كيف نعرف ماذا نفعل بها؟</p>
+<div class="grid">
+<div class="box"><span class="term">Header</span><br>معلومات تحكم/وصف تساعد البروتوكول على معالجة البيانات: عناوين، أرقام منافذ، معلومات أخرى بحسب الطبقة.</div>
+<div class="box"><span class="term">Payload</span><br>الجزء الذي تحمله الوحدة من بيانات الطبقة الأعلى.</div>
+</div>
+<div class="flow">┌──────────── Header ────────────┬──── Payload ────┐
+│ معلومات تساعد على المعالجة     │ البيانات المحمّلة │
+└────────────────────────────────┴──────────────────┘</div>
+</section>
+
+<section class="card">
+<h2>9. IP Address — "إلى أي Host/شبكة؟"</h2>
+<h3>المشكلة</h3><p>إذا أردت الوصول إلى Server بعيد، تحتاج عنوانًا يمكن استخدامه في طبقة IP لتحديد الوجهة.</p>
+<p><span class="term">IP Address</span> هو عنوان منطقي (Logical Address) يستخدمه IP لتحديد المصدر والوجهة على مستوى الشبكة.</p>
+<p>في مثال السلايدات: اسم النطاق يحتاج أولًا إلى ترجمة إلى IP Address بواسطة DNS، ثم تُرسل البيانات في IP Datagram، وتقوم Routers بتمريره hop by hop اعتمادًا على Routing Tables.</p>
+<div class="flow">www.example.com
+       ↓ DNS
+   203.0.113.10
+       ↓
+   IP Destination</div>
+<h3>لا تخلط</h3><p><strong>DNS لا ينقل صفحة الويب.</strong> هو جزء من خطوة معرفة IP المرتبط بالاسم في المثال.</p>
+</section>
+
+<section class="card">
+<h2>10. MAC Address — "إلى أي Interface على الوصلة المحلية؟"</h2>
+<h3>المشكلة</h3><p>لدينا IP للـnext-hop، لكن Ethernet يحتاج عنوان MAC للواجهة المقصودة على الوصلة المحلية.</p>
+<p><span class="term">MAC Address</span> هو عنوان مرتبط بواجهة الشبكة على مستوى Ethernet/Link Layer.</p>
+<p>السلايد الخاص بـARP يوضح أن Ethernet Frame يجب أن يصل إلى interface الخاصة بالـnext-hop router، وأن <strong>ARP request/reply</strong> تُستخدم لحل MAC Address.</p>
+<div class="flow">IP Address of next hop
+          ↓
+        ARP
+          ↓
+MAC Address of next-hop interface
+          ↓
+Ethernet Frame</div>
+</section>
+
+<section class="card">
+<h2>11. IP vs MAC — الفرق الذي يجب ألا تنساه</h2>
+<table>
+<tr><th></th><th>IP Address</th><th>MAC Address</th></tr>
+<tr><td>الفكرة</td><td>عنوان منطقي على مستوى IP</td><td>عنوان واجهة على مستوى Ethernet</td></tr>
+<tr><td>السؤال المبسط</td><td>إلى أي وجهة شبكية؟</td><td>إلى أي Interface على الوصلة المحلية؟</td></tr>
+<tr><td>في مثال السلايدات</td><td>يصلنا بعد DNS، وتستخدمه IP Layer</td><td>يُحل بواسطة ARP للـnext-hop interface</td></tr>
+<tr><td>العلاقة</td><td colspan="2">ليس أحدهما بديلًا عن الآخر؛ كل واحد يخدم طبقة/وظيفة مختلفة.</td></tr>
+</table>
+</section>
+
+<section class="card">
+<h2>12. Ethernet وFrame</h2>
+<h3>السؤال الطبيعي</h3><p>بعد أن أصبح لدينا IP Datagram، كيف نضعه على وصلة Ethernet المحلية؟</p>
+<p><span class="term">Ethernet</span> يحدد آلية وformat لإطار البيانات على وصلة Ethernet.</p>
+<p><span class="term">Frame</span> هو وحدة البيانات التي تحمل IP Datagram داخل Ethernet في المثال.</p>
+<div class="flow">Ethernet Frame
+┌───────────────┬───────────────────────┬──────────────┐
+│ Ethernet Hdr  │      IP Packet        │   Trailer    │
+└───────────────┴───────────────────────┴──────────────┘</div>
+<p>السلايدات تقول صراحة: <strong>The IP datagram is encapsulated in an Ethernet frame.</strong></p>
+</section>
+
+<section class="card">
+<h2>13. Port — لماذا IP وحده لا يكفي؟</h2>
+<h3>المشكلة</h3><p>تخيل أن جهازًا واحدًا يشغّل Browser وEmail وSSH في الوقت نفسه. إذا وصلت البيانات إلى الجهاز، لأي تطبيق يجب تسليمها؟</p>
+<p><span class="term">Port</span> رقم منطقي يستخدم مع بروتوكولات النقل (مثل TCP/UDP) لتمييز endpoint/application داخل الـHost.</p>
+<p>السلايدات تذكر أن <strong>port number</strong> يُحمل في عملية TCP، وأن HTTP request تُرسل عبر TCP connection.</p>
+<div class="flow">IP Address → يحدد الـHost
+Port       → يساعد في تحديد التطبيق/الخدمة داخل الـHost
+
+        IP + Port
+           ↓
+      TCP/UDP Endpoint</div>
+</section>
+
+<section class="card">
+<h2>14. المثال الكامل — Laptop → Web Server</h2>
+<p>هذه أهم فقرة في Day 1. لا تحفظ المصطلحات منفصلة؛ اتبع الرحلة.</p>
+<div class="flow">① المستخدم يكتب Domain Name
+        ↓
+② DNS Query → DNS Server
+        ↓
+③ DNS Reply ← IP Address
+        ↓
+④ Browser يستخدم HTTP
+        ↓
+⑤ TCP Connection
+        ↓
+⑥ HTTP Request داخل TCP Segment
+        ↓
+⑦ TCP Segment داخل IP Datagram
+        ↓
+⑧ IP Datagram داخل Ethernet Frame
+        ↓
+⑨ ARP يساعد في معرفة MAC للـnext-hop على الوصلة المحلية
+        ↓
+⑩ Routers تمرر IP Datagram hop-by-hop
+        ↓
+⑪ Server يستقبل Frame
+        ↓
+⑫ البيانات تصعد إلى الطبقات الأعلى
+        ↓
+⑬ Application تستقبل HTTP Request وترسل HTTP Response</div>
+<p>هذا التسلسل مستند مباشرة إلى سلسلة الأمثلة في Review slides: Application → DNS → TCP → IP → MAC/Ethernet → ARP → الطرف الآخر.</p>
+</section>
+
+<section class="card">
+<h2>15. Worked Example — لماذا يتغير Frame بينما تستمر الوجهة IP؟</h2>
+<p>افترض أن Laptop يريد الوصول إلى Server بعيد عبر Router أول.</p>
+<div class="flow">Laptop                         Router 1                    Server
+  │                               │                          │
+  │ Frame A                       │                          │
+  │ Dst MAC = Router1             │                          │
+  ├──────────────────────────────>│                          │
+  │        IP Dst = Server        │                          │
+  │                               │ Frame A انتهى هنا         │
+  │                               │                          │
+  │                               │ Frame B                   │
+  │                               │ Dst MAC = Next Hop        │
+  │                               ├─────────────────────────>│
+  │                               │        IP Dst = Server    │</div>
+<p><strong>الفكرة:</strong> الـEthernet Frame مرتبط بالوصلة المحلية الحالية، بينما الـIP Datagram يمثل الوجهة على مستوى IP. لذلك لا تتعامل مع MAC وIP كأنهما عنوانان يؤديان الوظيفة نفسها.</p>
+</section>
+
+<section class="card">
+<h2>16. لماذا هذا مهم لـSDN؟</h2>
+<p>السلايدات الخاصة بـSDN ستبني لاحقًا على فكرة أن الشبكات لها <strong>Control Plane</strong> و<strong>Data Plane</strong>، وأن Data Plane مسؤولة عن تنفيذ السلوك على الـPackets.</p>
+<p>لكننا <strong>لن نشرح Control Plane وData Plane اليوم</strong>. اليوم نحتاج فقط أن تكون لديك صورة واضحة عن الشيء الذي سيقوم الـData Plane بمعالجته: Packet/Frame، وأن تعرف الفرق بين IP وMAC وأن تفهم encapsulation.</p>
+<div class="note"><strong>سنعود لهذا لاحقًا:</strong> Switch, Router, Routing, Forwarding, Control Plane, Data Plane, OpenFlow, Flow Table, Controller.</div>
+</section>
+
+<section class="card">
+<h2>17. اختبار الفهم — Why / How / What if / Compare / Trace</h2>
+<div class="quiz"><strong>Why?</strong> لماذا نحتاج DNS قبل أن نبدأ الاتصال بالـWeb Server عندما نملك Domain Name فقط؟</div>
+<div class="quiz"><strong>How?</strong> كيف تتحول HTTP Request إلى شيء يمكن إرساله عبر الشبكة؟</div>
+<div class="quiz"><strong>What if?</strong> ماذا يحدث مفاهيميًا إذا كان IP معروفًا لكن MAC الخاص بالـnext-hop غير معروف على Ethernet؟</div>
+<div class="quiz"><strong>Compare</strong> قارن IP Address وMAC Address في جملة واحدة.</div>
+<div class="quiz"><strong>Trace</strong> تتبع HTTP Request من Browser حتى Ethernet Frame.</div>
+<details><summary>إجابات مختصرة</summary>
+<div class="answer">DNS: للحصول على IP المرتبط باسم النطاق في المثال.</div>
+<div class="answer">HTTP Data → TCP Segment → IP Datagram/Packet → Ethernet Frame.</div>
+<div class="answer">تُستخدم ARP Request/Reply لحل MAC Address للـnext-hop interface وفق السلايدات.</div>
+<div class="answer">IP يحدد الوجهة على مستوى IP؛ MAC يحدد واجهة على وصلة Ethernet المحلية.</div>
+<div class="answer">Browser/HTTP → TCP → IP → Ethernet، مع ARP عند الحاجة إلى MAC للـnext hop.</div>
+</details>
+</section>
+
+<section class="card">
+<h2>18. Common Confusions</h2>
+<ul>
+<li><strong>Packet ≠ Frame:</strong> الـFrame هو وحدة Link/Ethernet التي تحمل IP Packet في مثالنا.</li>
+<li><strong>IP ≠ MAC:</strong> لكل منهما وظيفة ومستوى مختلف.</li>
+<li><strong>DNS ≠ Internet:</strong> DNS خدمة لترجمة الأسماء إلى IP في هذا السيناريو.</li>
+<li><strong>Port ≠ IP:</strong> IP يساعد في تحديد Host؛ Port يميز endpoint/application داخل Host.</li>
+<li><strong>Host ≠ Link:</strong> Host جهاز؛ Link وصلة.</li>
+<li><strong>NIC ≠ Network:</strong> NIC واجهة الجهاز التي توصله بالشبكة.</li>
+<li><strong>لا تقفز إلى Routing الآن:</strong> السلايدات تذكر Routing Tables، لكن فهم آلية Routing/Forwarding التفصيلية مؤجل إلى Day 2.</li>
+</ul>
+</section>
+
+<section class="card">
+<h2>19. Key Terms</h2>
+<table>
+<tr><th>Term</th><th>المعنى</th><th>الفكرة التي يجب تذكرها</th></tr>
+<tr><td>Network</td><td>مجموعة أجهزة وروابط متصلة</td><td>بيئة تبادل البيانات</td></tr>
+<tr><td>Host</td><td>جهاز نهائي</td><td>Laptop / Server</td></tr>
+<tr><td>Node</td><td>نقطة/جهاز في الشبكة</td><td>مصطلح أوسع</td></tr>
+<tr><td>Link</td><td>وصلة بين عقدتين</td><td>مسار اتصال مباشر</td></tr>
+<tr><td>NIC</td><td>واجهة الشبكة</td><td>باب الجهاز إلى الشبكة</td></tr>
+<tr><td>Packet</td><td>وحدة بيانات شبكية عامة</td><td>IP Datagram في مثال السلايدات</td></tr>
+<tr><td>Frame</td><td>وحدة بيانات Link/Ethernet</td><td>تحمل IP Packet</td></tr>
+<tr><td>Header</td><td>معلومات تحكم</td><td>تساعد على المعالجة</td></tr>
+<tr><td>Payload</td><td>البيانات المحمولة</td><td>محتوى الطبقة الأعلى</td></tr>
+<tr><td>IP Address</td><td>عنوان منطقي</td><td>وجهة IP</td></tr>
+<tr><td>MAC Address</td><td>عنوان واجهة على Ethernet</td><td>الوجهة المحلية على الوصلة</td></tr>
+<tr><td>Ethernet</td><td>تقنية/بروتوكول Link شائع</td><td>Frame</td></tr>
+<tr><td>Port</td><td>رقم endpoint في TCP/UDP</td><td>أي تطبيق داخل الـHost؟</td></tr>
+</table>
+</section>
+
+<section class="card">
+<h2>20. One Big Picture</h2>
+<div class="flow">                 HOST
+                  │
+            ┌─────┴─────┐
+            │ Application│
+            └─────┬─────┘
+                  │ HTTP Data
+                  ▼
+            ┌───────────┐
+            │ TCP       │  ← Port
+            └─────┬─────┘
+                  │ Segment
+                  ▼
+            ┌───────────┐
+            │ IP        │  ← IP Address
+            └─────┬─────┘
+                  │ IP Datagram / Packet
+                  ▼
+            ┌───────────┐
+            │ Ethernet  │  ← MAC Address
+            └─────┬─────┘
+                  │ Frame
+                  ▼
+                 NIC
+                  │
+                  ▼
+                Link
+                  │
+                  ▼
+              Network ...</div>
+</section>
+
+<section class="card">
+<h2>21. Exam Questions</h2>
+<ol>
+<li><strong>What is the difference between a Packet and a Frame?</strong><br>الإجابة: Packet مصطلح عام لوحدة بيانات شبكية، وفي مثالنا IP Datagram؛ Frame وحدة Link/Ethernet تحمل الـIP Packet.</li>
+<li><strong>Why do we need both IP and MAC addresses?</strong><br>الإجابة: لأنهما يخدمان وظيفتين مختلفتين: IP على مستوى الشبكة، وMAC لتوصيل Frame عبر وصلة Ethernet المحلية.</li>
+<li><strong>What is encapsulation?</strong><br>الإجابة: إضافة معلومات الطبقة الحالية حول بيانات الطبقة الأعلى، بحيث تصبح وحدة بيانات قابلة للمعالجة والنقل في تلك الطبقة.</li>
+<li><strong>What does a Port identify?</strong><br>الإجابة: endpoint/application داخل Host في سياق TCP/UDP.</li>
+<li><strong>Trace an HTTP request.</strong><br>الإجابة المختصرة: HTTP → TCP Segment → IP Datagram → Ethernet Frame.</li>
+</ol>
+</section>
+
+<section class="card">
+<h2>22. Checkpoint — هل أنت جاهز لـDay 2؟</h2>
+<p>لا تنتقل إلى Day 2 حتى تستطيع الإجابة <strong>دون النظر</strong> عن هذه الأسئلة:</p>
+<ol>
+<li>ما الفرق بين Host وNode؟</li>
+<li>ما هو Link وما هي NIC؟</li>
+<li>ما الفرق بين Packet وFrame؟</li>
+<li>ما وظيفة Header وما وظيفة Payload؟</li>
+<li>لماذا نحتاج IP Address؟</li>
+<li>لماذا نحتاج MAC Address؟</li>
+<li>لماذا نحتاج Port؟</li>
+<li>اشرح: HTTP Data → TCP Segment → IP Datagram → Ethernet Frame.</li>
+<li>لماذا يستخدم المثال DNS؟</li>
+<li>كيف يساعد ARP في الوصول إلى next-hop interface؟</li>
+</ol>
+<div class="note"><strong>معيار الإتقان:</strong> إذا استطعت شرح الرحلة كاملة بالكلمات، وليس فقط اختيار إجابات صحيحة، فأنت جاهز للانتقال إلى Switch / Router / Routing / Forwarding.</div>
+</section>
+
+<footer>
+Day 1 — Networking Mental Model · مبني على SDN Study Plan & Teaching Protocol + Topic 0 Review + SDN slides
+</footer>
+</main>
+</body>
+</html>
